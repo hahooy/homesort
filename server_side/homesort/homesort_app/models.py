@@ -6,14 +6,21 @@ import hashlib
 
 
 class Shelter(models.Model):
+    name = models.CharField(max_length=512, blank=True, null=True)
     address = models.CharField(max_length=512, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
-    phone = models.CharField(max_length=24, blank=True, null=True)
+    phone = models.CharField(max_length=512, blank=True, null=True)
     point = models.PointField(blank=True, null=True)
     all_beds = models.IntegerField(blank=True, null=True)
     male_only = models.BooleanField(default=False)
     female_only = models.BooleanField(default=False)
     youth_only = models.BooleanField(default=False)
+
+    def __str__(self):
+        if self.name is not None:
+            return self.name
+        else:
+            return self.address
 
 
 class HomelessPerson(models.Model):
@@ -43,6 +50,9 @@ class HomelessPerson(models.Model):
         self.modified = timezone.now()
         return super(HomelessPerson, self).save(*args, **kwargs)
 
+    def __str__(self):
+        return self.firstname + ' ' + self.lastname
+
 
 class Record(models.Model):
     shelter = models.ForeignKey(Shelter)
@@ -68,3 +78,6 @@ class Record(models.Model):
             self.created = timezone.now()
         self.modified = timezone.now()
         return super(Record, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.homelessPerson.firstname + ' ' + self.homelessPerson.lastname + '@' + self.shelter.address + '[' + self.status + ']'
