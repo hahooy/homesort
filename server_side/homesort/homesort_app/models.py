@@ -54,23 +54,12 @@ class HomelessPerson(models.Model):
         return self.firstname + ' ' + self.lastname
 
 
-class Record(models.Model):
+class Reservation(models.Model):
     shelter = models.ForeignKey(Shelter)
     homelessPerson = models.ForeignKey(HomelessPerson)
     point = models.PointField(blank=True, null=True)
     created = models.DateTimeField(editable=False)
     modified = models.DateTimeField()
-
-    STATUS_CHOICES = (
-        ('RE', 'reserved'),
-        ('IN', 'living'),
-        ('LE', 'leave'),
-    )
-    status = models.CharField(
-        max_length=2,
-        choices=STATUS_CHOICES,
-        default='RE',
-    )
 
     def save(self, *args, **kwargs):
         ''' On save, update timestamps '''
@@ -80,4 +69,21 @@ class Record(models.Model):
         return super(Record, self).save(*args, **kwargs)
 
     def __str__(self):
-        return self.homelessPerson.firstname + ' ' + self.homelessPerson.lastname + '@' + self.shelter.address + '[' + self.status + ']'
+        return self.homelessPerson.firstname + ' ' + self.homelessPerson.lastname + '@' + self.shelter.address
+
+
+class Residence(models.Model):
+    shelter = models.ForeignKey(Shelter)
+    homelessPerson = models.ForeignKey(HomelessPerson)
+    created = models.DateTimeField(editable=False)
+    modified = models.DateTimeField()
+
+    def save(self, *args, **kwargs):
+        ''' On save, update timestamps '''
+        if not self.id:
+            self.created = timezone.now()
+        self.modified = timezone.now()
+        return super(Record, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.homelessPerson.firstname + ' ' + self.homelessPerson.lastname + '@' + self.shelter.address
